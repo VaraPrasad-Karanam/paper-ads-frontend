@@ -8,7 +8,6 @@ const AdModal = ({
   onNavigate,
   onDelete,
 }) => {
-  // Per-ad images with future multi-image support
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -58,7 +57,6 @@ const AdModal = ({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-    // eslint-disable-next-line
   }, [isDragging, dragStart, position, zoom, ad, adIndex, ads]);
 
   if (!ad || !ads || adIndex == null) return null;
@@ -67,7 +65,9 @@ const AdModal = ({
   const images = ad.images || [ad.imagePath];
   const currentImage = images[currentImageIndex];
 
-  const getImageUrl = (imagePath) => `http://localhost:5000/${imagePath}`;
+  // Cloudinary: imagePath is a full URL
+  const getImageUrl = (imagePath) => imagePath;
+  
   const formatDate = (date) => new Date(date).toLocaleDateString();
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -143,7 +143,6 @@ const AdModal = ({
         
         <div className="modal-body-large">
           <div className="image-viewer">
-            {/* Cross-ad navigation arrows */}
             {ads.length > 1 && (
               <>
                 <button className="nav-arrow nav-left" onClick={prevAd} title="Previous Ad (←)">
@@ -154,8 +153,6 @@ const AdModal = ({
                 </button>
               </>
             )}
-            
-            {/* Main Image */}
             <div className="image-container-large" style={{ cursor: zoom > 1 ? 'grab' : 'default' }}>
               <img 
                 ref={imageRef}
@@ -172,12 +169,11 @@ const AdModal = ({
                   else handleZoomReset();
                 }}
                 onError={(e) => {
+                  console.log('Modal image load error:', e.target.src);
                   e.target.src = `data:image/svg+xml,<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="%23e0e0e0"/><text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="%23333" text-anchor="middle" dy=".3em">Image not found</text></svg>`;
                 }}
               />
             </div>
-
-            {/* Thumbnail Navigation (multi-image support) */}
             {images.length > 1 && (
               <div className="thumbnail-strip">
                 {images.map((img, index) => (
@@ -196,8 +192,6 @@ const AdModal = ({
               </div>
             )}
           </div>
-          
-          {/* Info */}
           <div className="info-panel">
             <div className="info-section">
               {ad.description && (

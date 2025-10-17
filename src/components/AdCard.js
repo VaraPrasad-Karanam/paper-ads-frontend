@@ -2,7 +2,8 @@ import React from 'react';
 
 const AdCard = ({ ad, onView, onDelete }) => {
   const getImageUrl = (imagePath) => {
-    return `http://localhost:5000/${imagePath}`;
+    // Now imagePath is a full Cloudinary URL
+    return imagePath;
   };
 
   const formatDate = (date) => {
@@ -30,6 +31,7 @@ const AdCard = ({ ad, onView, onDelete }) => {
           alt={ad.title || 'Ad image'} 
           className="ad-image"
           onError={(e) => {
+            console.log('Image load error:', e.target.src);
             e.target.src = `data:image/svg+xml,<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="%23e0e0e0"/><text x="50%" y="50%" font-family="Arial, sans-serif" font-size="16" fill="%23333" text-anchor="middle" dy=".3em">Image not found</text></svg>`;
           }}
         />

@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://admanager-2.onrender.com/api'
-  : 'http://localhost:5000/api';
+// Prefer the REACT_APP_API_URL env variable for all deployments!
+const API_BASE_URL = process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://admanager-2.onrender.com/api'
+    : 'http://localhost:5000/api');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,34 +17,30 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    console.log(`Making ${config.method.toUpperCase()} request to: ${config.url}`);
+    console.log(`Making ${config.method.toUpperCase()} request to: ${config.baseURL}${config.url}`);
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     console.error('API Error:', error.response?.data || error.message);
-    
+
     if (error.code === 'ECONNABORTED') {
       throw new Error('Request timeout. Please try again.');
     }
-    
+
     if (!error.response) {
       throw new Error('Network error. Please check your connection.');
     }
-    
+
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }
-    
+
     throw error;
   }
 );
